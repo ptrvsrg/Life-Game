@@ -2,36 +2,23 @@
 #define LIFE_CELL_H
 
 #include <iostream>
+#include <stdexcept>
 
 struct Cell
 {
     int m_x = 0;
     int m_y = 0;
-    int m_neighbours = 0;
 
-    template<typename CharT, typename Traits>
-    friend std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & os,
-                                                          const Cell cell);
-    template<typename CharT, typename Traits>
-    friend std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & is,
-                                                          Cell & cell);
+    friend std::ostream & operator<<(std::ostream & os, Cell cell);
+    friend std::istream & operator>>(std::istream & is, Cell & cell);
 };
 
-template<typename CharT, typename Traits>
-std::basic_ostream<CharT, Traits> & operator<<(std::basic_ostream<CharT, Traits> & os,
-                                               const Cell cell)
-{
-    os << cell.m_x << " " << cell.m_y;
-    return os;
-}
+// Errors
 
-template<typename CharT, typename Traits>
-std::basic_istream<CharT, Traits> & operator>>(std::basic_istream<CharT, Traits> & is,
-                                               Cell & cell)
+class CellError : public std::runtime_error
 {
-    is >> cell.m_x;
-    is >> cell.m_y;
-    return is;
-}
+public:
+    CellError();
+};
 
 #endif // LIFE_CELL_H

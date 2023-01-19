@@ -1,8 +1,9 @@
 message(STATUS "Creating library \"cell\"")
 
-add_library(cell INTERFACE)
+add_library(cell STATIC
+        src/cell.cpp)
 target_include_directories(cell
-        INTERFACE include)
+        PUBLIC include)
 
 message(STATUS "Creating tests for library \"cell\"")
 find_package(GTest)

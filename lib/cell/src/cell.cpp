@@ -2,14 +2,26 @@
 
 std::ostream & operator<<(std::ostream & os, Cell cell)
 {
-    os << cell.m_x << " " << cell.m_y;
+    os << cell.m_x << " " << cell.m_y << std::endl;
     return os;
 }
 
 std::istream & operator>>(std::istream & is, Cell & cell)
 {
-    is >> cell.m_x;
-    is >> cell.m_y;
+    std::ios_base::iostate state = is.exceptions();
+    is.exceptions(std::ios_base::failbit);
+
+    try
+    {
+        is >> cell.m_x;
+        is >> cell.m_y;
+    }
+    catch (const std::ios_base::failure & ex)
+    {
+        throw CellCoordinatesError();
+    }
+
+    is.exceptions(state);
 
     return is;
 }

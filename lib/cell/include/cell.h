@@ -15,10 +15,10 @@ struct Cell
 
 // Errors
 
-class CellError : public std::runtime_error
+class CellCoordinatesError : public std::runtime_error
 {
 public:
-    CellError();
+    CellCoordinatesError();
 };
 
 #endif // LIFE_CELL_H

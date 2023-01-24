@@ -14,5 +14,5 @@ std::istream & operator>>(std::istream & is, Cell & cell)
     return is;
 }
 
-CellError::CellError()
+CellCoordinatesError::CellCoordinatesError()
     : std::runtime_error("Incorrect cell coordinates\n") {}

@@ -11,18 +11,33 @@ TEST(tests_cell, check_output)
 
     oss << cell;
 
-    EXPECT_EQ(oss.str(), "10 20");
+    EXPECT_EQ(oss.str(), "10 20\n");
 }
 
 TEST(tests_cell, check_input)
 {
-    std::istringstream iss("10 20");
-    Cell cell;
+    {
+        std::istringstream iss("10 20");
+        Cell cell;
 
-    iss >> cell;
+        iss >> cell;
 
-    EXPECT_EQ(cell.m_x, 10);
-    EXPECT_EQ(cell.m_y, 20);
+        EXPECT_EQ(cell.m_x, 10);
+        EXPECT_EQ(cell.m_y, 20);
+    }
+
+    {
+        std::istringstream iss("10 a");
+        Cell cell;
+
+        EXPECT_THROW
+        (
+            {
+                iss >> cell;
+            },
+            CellCoordinatesError
+        );
+    }
 }
 
 int main(int argc, char ** argv)

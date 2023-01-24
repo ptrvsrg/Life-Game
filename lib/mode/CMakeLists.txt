@@ -1,0 +1,4 @@
+add_subdirectory(abstract_mode)
+add_subdirectory(mode_creator)
+add_subdirectory(offline_mode)
+add_subdirectory(online_mode)

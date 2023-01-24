@@ -3,7 +3,12 @@ message(STATUS "Creating library \"field\"")
 add_library(field STATIC
         src/field.cpp)
 target_include_directories(field
-        PUBLIC include)
+        PUBLIC include
+        PUBLIC ${CMAKE_SOURCE_DIR}/lib/cell/include)
+target_link_directories(field
+        PUBLIC ${CMAKE_BINARY_DIR}/lib/cell)
+target_link_libraries(field
+        PUBLIC cell)
 
 message(STATUS "Creating tests for library \"field\"")
 find_package(GTest)

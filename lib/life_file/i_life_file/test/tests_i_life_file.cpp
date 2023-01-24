@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include "life_file.h"
+#include "i_life_file.h"
+#include "cell.h"
 
 struct LifeFileArgs
 {
@@ -7,9 +8,9 @@ struct LifeFileArgs
     enum ExceptionType
     {
         NO_EXCEPTION,
-        CELL_ERROR,
+        CELL_COORDINATES_ERROR,
         DIGIT_SET_ERROR,
-        FIELD_ERROR,
+        FIELD_SIZE_ERROR,
         FILE_FORMAT_ERROR
     } m_exception_type;
 
@@ -27,13 +28,13 @@ INSTANTIATE_TEST_SUITE_P
     ::testing::Values
     (
         LifeFileArgs("files/file_format.life", LifeFileArgs::FILE_FORMAT_ERROR),
-        LifeFileArgs("files/without_field_size_1.life", LifeFileArgs::FIELD_ERROR),
-        LifeFileArgs("files/without_field_size_2.life", LifeFileArgs::FIELD_ERROR),
-        LifeFileArgs("files/without_field_size_3.life", LifeFileArgs::FIELD_ERROR),
+        LifeFileArgs("files/without_field_size_1.life", LifeFileArgs::FIELD_SIZE_ERROR),
+        LifeFileArgs("files/without_field_size_2.life", LifeFileArgs::FIELD_SIZE_ERROR),
+        LifeFileArgs("files/without_field_size_3.life", LifeFileArgs::FIELD_SIZE_ERROR),
         LifeFileArgs("files/incorrect_rules_1.life", LifeFileArgs::DIGIT_SET_ERROR),
         LifeFileArgs("files/incorrect_rules_2.life", LifeFileArgs::DIGIT_SET_ERROR),
-        LifeFileArgs("files/negative_coordinates.life", LifeFileArgs::CELL_ERROR),
-        LifeFileArgs("files/incorrect_coordinates.life", LifeFileArgs::CELL_ERROR),
+        LifeFileArgs("files/negative_coordinates.life", LifeFileArgs::CELL_COORDINATES_ERROR),
+        LifeFileArgs("files/incorrect_coordinates.life", LifeFileArgs::CELL_COORDINATES_ERROR),
         LifeFileArgs("files/comments.life", LifeFileArgs::NO_EXCEPTION)
     )
 );
@@ -44,34 +45,41 @@ TEST_P(LifeFileTest, check_exception)
 
     switch (params.m_exception_type)
     {
-        case LifeFileArgs::CELL_ERROR:
-            EXPECT_THROW(
+        case LifeFileArgs::CELL_COORDINATES_ERROR:
+            EXPECT_THROW
+            (
                 {
-                    LifeFile life_file(params.m_name);
+                    ILifeFile life_file(params.m_name);
+                    Universe universe = life_file.ReadUniverse();
                 },
-                CellError
+                CellCoordinatesError
             );
             break;
         case LifeFileArgs::DIGIT_SET_ERROR:
-            EXPECT_THROW(
+            EXPECT_THROW
+            (
                 {
-                    LifeFile life_file(params.m_name);
+                    ILifeFile life_file(params.m_name);
+                    Universe universe = life_file.ReadUniverse();
                 },
                 DigitSetError
             );
             break;
-        case LifeFileArgs::FIELD_ERROR:
-            EXPECT_THROW(
+        case LifeFileArgs::FIELD_SIZE_ERROR:
+            EXPECT_THROW
+            (
                 {
-                    LifeFile life_file(params.m_name);
+                    ILifeFile life_file(params.m_name);
+                    Universe universe = life_file.ReadUniverse();
                 },
-                FieldError
+                FieldSizeError
             );
             break;
         case LifeFileArgs::FILE_FORMAT_ERROR:
-            EXPECT_THROW(
+            EXPECT_THROW
+            (
                 {
-                    LifeFile life_file(params.m_name);
+                    ILifeFile life_file(params.m_name);
                 },
                 FileFormatError
             );
@@ -79,7 +87,8 @@ TEST_P(LifeFileTest, check_exception)
         case LifeFileArgs::NO_EXCEPTION:
             EXPECT_NO_THROW
             (
-                LifeFile life_file(params.m_name);
+                ILifeFile life_file(params.m_name);
+                Universe universe = life_file.ReadUniverse();
             );
             break;
     }

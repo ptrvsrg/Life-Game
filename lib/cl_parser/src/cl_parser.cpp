@@ -20,7 +20,13 @@ bool GetOptions(int argc,
          po::value<std::string>(&opts.m_output_file),
          "Output file")
         ("iterations,i",
-         po::value<int>(&opts.m_iterations),
+         po::value<int>(&opts.m_iterations)->notifier(
+             [](int x)
+             {
+                 if (x < 0)
+                     throw po::validation_error(po::validation_error::invalid_option_value);
+             }
+         ),
          "Iteration count");
 
     // parse command line arguments

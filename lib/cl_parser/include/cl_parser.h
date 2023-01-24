@@ -7,7 +7,7 @@ struct Options
 {
     std::string m_input_file;
     std::string m_output_file;
-    int m_iterations = 0;
+    int m_iterations = -1;
 
     Options() = default;
 };

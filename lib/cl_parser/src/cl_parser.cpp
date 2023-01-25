@@ -23,6 +23,7 @@ bool GetOptions(int argc,
          po::value<int>(&opts.m_iterations)->notifier(
              [](int x)
              {
+                 // Case: negative iteration count
                  if (x < 0)
                      throw po::validation_error(po::validation_error::invalid_option_value);
              }

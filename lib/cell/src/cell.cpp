@@ -1,5 +1,19 @@
 #include "cell.h"
 
+bool Cell::operator==(const Cell & cell) const
+{
+    return (m_x == cell.m_x) && (m_y == cell.m_y);
+}
+
+bool Cell::operator<(const Cell & cell) const
+{
+    // Case: x coordinates are equal
+    if (m_x == cell.m_x)
+        return m_y < cell.m_y;
+
+    return m_x < cell.m_x;
+}
+
 std::ostream & operator<<(std::ostream & os, Cell cell)
 {
     os << cell.m_x << " " << cell.m_y << std::endl;

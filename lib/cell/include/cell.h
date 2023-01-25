@@ -6,8 +6,11 @@
 
 struct Cell
 {
-    int m_x = 0;
-    int m_y = 0;
+    size_t m_x;
+    size_t m_y;
+
+    bool operator==(const Cell & cell) const;
+    bool operator<(const Cell & cell) const;
 
     friend std::ostream & operator<<(std::ostream & os, Cell cell);
     friend std::istream & operator>>(std::istream & is, Cell & cell);

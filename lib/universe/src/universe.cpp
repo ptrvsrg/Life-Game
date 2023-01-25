@@ -1,17 +1,21 @@
 #include "universe.h"
 
-Universe::Universe(Field field,
+Universe::Universe(std::set<Cell> cells,
+                   size_t height,
+                   size_t width,
                    std::string name,
-                   std::set<int> birth_count,
-                   std::set<int> survival_count)
-    : m_field(std::move(field)),
+                   std::set<size_t> birth_rules,
+                   std::set<size_t> survival_rules)
+    : m_cells(std::move(cells)),
+      m_height(height),
+      m_width(width),
       m_name(std::move(name)),
-      m_birth_count(std::move(birth_count)),
-      m_survival_count(std::move(survival_count)) {}
+      m_birth_rules(std::move(birth_rules)),
+      m_survival_rules(std::move(survival_rules)) {}
 
-Field Universe::GetField() const
+std::set<Cell> Universe::GetCells() const
 {
-    return m_field;
+    return m_cells;
 }
 
 std::string Universe::GetName() const
@@ -19,40 +23,68 @@ std::string Universe::GetName() const
     return m_name;
 }
 
-std::set<int> Universe::GetBirthCount() const
+size_t Universe::GetHeight() const
 {
-    return m_birth_count;
+    return m_height;
 }
 
-std::set<int> Universe::GetSurvivalCount() const
+size_t Universe::GetWidth() const
 {
-    return m_survival_count;
+    return m_width;
+}
+
+std::set<size_t> Universe::GetBirthRules() const
+{
+    return m_birth_rules;
+}
+
+std::set<size_t> Universe::GetSurvivalRules() const
+{
+    return m_survival_rules;
 }
 
 void Universe::GenerateNextGeneration()
 {
-    Field field(m_field.GetWidth(), m_field.GetHeight());
-    ++m_generation_num;
-    for (int i = 0; i < m_field.GetHeight(); ++i)
-        for (int j = 0; j < m_field.GetWidth(); ++j)
-        {
-            field[i][j] = m_field[i][j];
+    // Set of updated cells
+    std::set<Cell> updated_cells = m_cells;
 
-            int live_neighbors = m_field.CountNeighbors({j, i});
-            if (m_field[i][j] && m_survival_count.find(live_neighbors) == m_survival_count.end())
-                field[i][j] = false;
-            if (!m_field[i][j] && m_birth_count.find(live_neighbors) != m_birth_count.end())
-                field[i][j] = true;
+    for (size_t i = 0; i < m_height; ++i)
+        for (size_t j = 0; j < m_width; ++j)
+        {
+            Cell cell = {j, i};
+
+            // Count neighbors
+            size_t neighbors = CountNeighbors(cell);
+
+            // Case: cell will die
+            if (m_cells.find(cell) != m_cells.end()
+                && m_survival_rules.find(neighbors) == m_survival_rules.end())
+                updated_cells.erase(cell);
+
+            // Case: cell will be born
+            if (m_cells.find(cell) == m_cells.end()
+                && m_birth_rules.find(neighbors) != m_birth_rules.end())
+                updated_cells.insert(cell);
         }
 
-    m_field = field;
+    m_cells = updated_cells;
 }
 
-std::ostream & operator<<(std::ostream & os, const Universe & universe)
+size_t Universe::CountNeighbors(Cell cell)
 {
-    os << "Name: " << universe.m_name << std::endl;
-    os << "Generation: " << universe.m_generation_num << std::endl;
-    os << universe.m_field;
+    size_t neighbors = 0;
+    for (int i = -1; i <= 1; ++i)
+        for (int j = -1; j <= 1; ++j)
+            if (i != 0 || j != 0)
+            {
+                Cell neighbour_cell = {
+                    (cell.m_x + m_width + i) % m_width,
+                    (cell.m_y + m_height + j) % m_height,
+                };
 
-    return os;
+                if (m_cells.find(neighbour_cell) != m_cells.end())
+                    ++neighbors;
+            }
+
+    return neighbors;
 }

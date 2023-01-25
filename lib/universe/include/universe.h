@@ -4,30 +4,35 @@
 #include <iostream>
 #include <string>
 #include <set>
-#include "field.h"
+#include "cell.h"
 
 class Universe
 {
 public:
     Universe() = default;
-    explicit Universe(Field field,
-                      std::string name = "My Universe",
-                      std::set<int> birth_count = std::set<int>({ 3 }),
-                      std::set<int> survival_count = std::set<int>({ 2, 3 }));
-    Field GetField() const;
+    Universe(std::set<Cell> cells,
+             size_t height,
+             size_t width,
+             std::string name,
+             std::set<size_t> birth_rules,
+             std::set<size_t> survival_rules);
+    std::set<Cell> GetCells() const;
     std::string GetName() const;
-    std::set<int> GetBirthCount() const;
-    std::set<int> GetSurvivalCount() const;
+    size_t GetHeight() const;
+    size_t GetWidth() const;
+    std::set<size_t> GetBirthRules() const;
+    std::set<size_t> GetSurvivalRules() const;
     void GenerateNextGeneration();
 
-    friend std::ostream & operator<<(std::ostream & os, const Universe & universe);
-
 private:
-    Field m_field;
+    std::set<Cell> m_cells;
     std::string m_name;
-    std::set<int> m_birth_count;
-    std::set<int> m_survival_count;
-    int m_generation_num = 1;
+    size_t m_height = 0;
+    size_t m_width = 0;
+    std::set<size_t> m_birth_rules;
+    std::set<size_t> m_survival_rules;
+
+    size_t CountNeighbors(Cell cell);
 };
 
 #endif //LIFE_UNIVERSE_H

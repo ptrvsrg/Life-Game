@@ -13,7 +13,7 @@ public:
     virtual void Launch() = 0;
     static ModePtr CreateMode(const std::string & input_file,
                               const std::string & output_file,
-                              unsigned int iterations);
+                              int iterations);
 };
 
 #endif //TASK2_LIFE_MODE_INTERFACE_H

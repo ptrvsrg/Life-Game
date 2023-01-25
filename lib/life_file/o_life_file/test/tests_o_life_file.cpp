@@ -4,13 +4,9 @@
 
 TEST(test_o_life_file, check)
 {
-    // Create universe
-    Field field (3, 3);
-    field[0][0] = true;
-    field[1][1] = true;
-    field[2][2] = true;
-
-    Universe universe(field,
+    Universe universe({ {0, 0}, {1, 1}, {2, 2} },
+                      10,
+                      10,
                       "Check",
                       {1, 2, 3},
                       {4, 5, 6});
@@ -36,8 +32,8 @@ TEST(test_o_life_file, check)
     EXPECT_EQ(oss.str(),
               "#Life 1.06\n"
               "#N Check\n"
+              "#S 10 10\n"
               "#R B123 S456\n"
-              "#S 3 3\n"
               "0 0\n"
               "1 1\n"
               "2 2\n\n");

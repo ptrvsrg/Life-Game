@@ -11,8 +11,7 @@ class OLifeFile : virtual LifeFileBase
 public:
     OLifeFile() = default;
     explicit OLifeFile(const std::string & file_name);
-    void Open(const std::string & file_name);
-    void WriteUniverse(const Universe& universe);
+    void WriteUniverse(const Universe & universe);
 
 private:
     void WriteHeader();

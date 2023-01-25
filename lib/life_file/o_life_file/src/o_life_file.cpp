@@ -1,8 +1,8 @@
 #include "o_life_file.h"
 
-static std::ostream & operator<<(std::ostream & os, const std::set<int> & set)
+static std::ostream & operator<<(std::ostream & os, const std::set<size_t> & set)
 {
-    for (int value : set)
+    for (size_t value : set)
         os << value;
 
     return os;
@@ -10,13 +10,10 @@ static std::ostream & operator<<(std::ostream & os, const std::set<int> & set)
 
 OLifeFile::OLifeFile(const std::string & file_name)
 {
-    this->Open(file_name);
-}
-
-void OLifeFile::Open(const std::string & file_name)
-{
     // Open file
     m_fs.open(file_name, std::fstream::out);
+    if (!m_fs.is_open())
+        throw FileOpeningError();
 
     // Write file header
     WriteHeader();
@@ -27,15 +24,14 @@ void OLifeFile::WriteUniverse(const Universe & universe)
     // Write name
     m_fs << "#N " << universe.GetName() << std::endl;
 
-    // Write rules
-    m_fs << "#R B" << universe.GetBirthCount() << " S" << universe.GetSurvivalCount() << std::endl;
-
     // Write size
-    Field field = universe.GetField();
-    m_fs << "#S " << field.GetWidth() << " " << field.GetHeight() << std::endl;
+    m_fs << "#S " << universe.GetHeight() << ' ' << universe.GetWidth() << std::endl;
+
+    // Write rules
+    m_fs << "#R B" << universe.GetBirthRules() << " S" << universe.GetSurvivalRules() << std::endl;
 
     // Write cells
-    for (auto cell : field.GetCells())
+    for (auto cell : universe.GetCells())
         m_fs << cell;
 }
 

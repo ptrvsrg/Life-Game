@@ -12,12 +12,11 @@ class ILifeFile : virtual LifeFileBase
 public:
     ILifeFile() = default;
     explicit ILifeFile(const std::string & file_name);
-    void Open(const std::string & file_name);
     Universe ReadUniverse();
 
 private:
     void CheckHeader();
-    Field ReadField(int width, int height);
+    std::set<Cell> ReadCells();
 };
 
 // Errors
@@ -26,6 +25,12 @@ class FileFormatError : public std::runtime_error
 {
 public:
     FileFormatError();
+};
+
+class FieldSizeError : public std::runtime_error
+{
+public:
+    FieldSizeError();
 };
 
 class DigitSetError : public std::runtime_error

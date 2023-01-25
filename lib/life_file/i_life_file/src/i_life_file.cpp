@@ -6,13 +6,10 @@
 
 ILifeFile::ILifeFile(const std::string & file_name)
 {
-    this->Open(file_name);
-}
-
-void ILifeFile::Open(const std::string & file_name)
-{
     // Open file
     m_fs.open(file_name, std::fstream::in);
+    if (!m_fs.is_open())
+        throw FileOpeningError();
 
     // Check file header
     CheckHeader();
@@ -20,11 +17,12 @@ void ILifeFile::Open(const std::string & file_name)
 
 Universe ILifeFile::ReadUniverse()
 {
-    std::string name;
-    int width = -1;
-    int height = -1;
-    std::set<int> birth_count;
-    std::set<int> survival_count;
+    // Default values
+    std::string name = "My Universe";
+    size_t height = 0;
+    size_t width = 0;
+    std::set<size_t> birth_rules{ 3 };
+    std::set<size_t> survival_rules{ 2, 3 };
 
     while (true)
     {
@@ -38,7 +36,7 @@ Universe ILifeFile::ReadUniverse()
         if (std::regex_search(info_line, std::regex("#N ")))
             // Set universe name
             name = std::regex_replace(info_line, std::regex("#N "), "");
-        else if (std::regex_search(info_line, std::regex("#S ")))
+        else if (std::regex_search(info_line, std::regex("#S")))
         {
             std::istringstream iss(std::regex_replace(info_line, std::regex("#S "), ""));
 
@@ -48,13 +46,8 @@ Universe ILifeFile::ReadUniverse()
             try
             {
                 // Set width or size
+                iss >> height;
                 iss >> width;
-
-                // Case: only size is set
-                if (iss.eof())
-                    height = width;
-                else
-                    iss >> height;
             }
             catch (const std::ios_base::failure & ex)
             {
@@ -74,7 +67,7 @@ Universe ILifeFile::ReadUniverse()
                 {
                     if (!std::isdigit(digit))
                         throw DigitSetError();
-                    birth_count.insert(digit - '0');
+                    birth_rules.insert(digit - '0');
                 }
             }
 
@@ -86,7 +79,7 @@ Universe ILifeFile::ReadUniverse()
                 {
                     if (!std::isdigit(digit))
                         throw DigitSetError();
-                    survival_count.insert(digit - '0');
+                    survival_rules.insert(digit - '0');
                 }
             }
         }
@@ -102,19 +95,19 @@ Universe ILifeFile::ReadUniverse()
     if (name.empty())
         std::clog << "Warning: Universe name is missing, "
                      "it will be set by default \"My Universe\"\n";
-    if (birth_count.empty())
+    if (birth_rules.empty())
         std::clog << "Warning: Number of live cells for birth is missing, "
                      "it will be set by default \"3\"\n";
-    if (survival_count.empty())
+    if (survival_rules.empty())
         std::clog << "Warning: Number of live cells for survival is missing, "
                      "it will be set by default \"23\"\n";
 
-    Field field = ReadField(width, height);
-    Universe universe(field,
-                      name,
-                      birth_count,
-                      survival_count);
-    return universe;
+    return Universe(ReadCells(),
+                    height,
+                    width,
+                    name,
+                    birth_rules,
+                    survival_rules);
 }
 
 void ILifeFile::CheckHeader()
@@ -128,11 +121,9 @@ void ILifeFile::CheckHeader()
         throw FileFormatError();
 }
 
-Field ILifeFile::ReadField(int width, int height)
+std::set<Cell> ILifeFile::ReadCells()
 {
-    // Create field
-    Field field(width, height);
-
+    std::set<Cell> cells;
     while (true)
     {
         // Read line from file stream
@@ -140,7 +131,7 @@ Field ILifeFile::ReadField(int width, int height)
         std::getline(m_fs, info_line);
 
         // End of file
-        if (info_line.empty())
+        if (info_line.empty() && m_fs.eof())
             break;
 
         // Only comment
@@ -152,23 +143,28 @@ Field ILifeFile::ReadField(int width, int height)
         if (std::regex_search(info_line, smatch, std::regex("^[^#]*")))
             info_line = smatch[0].str();
 
+        // Read cell
         std::istringstream iss(info_line);
-        Cell cell;
+        Cell cell{};
         iss >> cell;
 
-        // Case: negative coordinates
-        if (cell.m_x < 0 || cell.m_y < 0)
-            throw CellCoordinatesError();
+        // Warning
+        if (cells.find(cell) != cells.end())
+            std::clog << "Warning: Duplicate coordinate detected, "
+                         "it will be deleted\n";
 
-        // Set cell in field
-        field[cell.m_y][cell.m_x] = true;
+        // Insert cell
+        cells.insert(cell);
     }
 
-    return field;
+    return cells;
 }
 
 FileFormatError::FileFormatError()
     : std::runtime_error("Incorrect file format\n") {}
+
+FieldSizeError::FieldSizeError()
+    : std::runtime_error("Incorrect field size\n") {}
 
 DigitSetError::DigitSetError()
     : std::runtime_error("Incorrect digit set\n") {}

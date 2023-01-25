@@ -4,11 +4,11 @@ add_library(universe STATIC
         src/universe.cpp)
 target_include_directories(universe
         PUBLIC include
-        PUBLIC ${CMAKE_SOURCE_DIR}/lib/field/include)
+        PUBLIC ${CMAKE_SOURCE_DIR}/lib/cell/include)
 target_link_directories(universe
-        PUBLIC ${CMAKE_BINARY_DIR}/lib/field)
+        PUBLIC ${CMAKE_BINARY_DIR}/lib/cell)
 target_link_libraries(universe
-        PUBLIC field)
+        PUBLIC cell)
 
 message(STATUS "Creating tests for library \"universe\"")
 find_package(GTest)

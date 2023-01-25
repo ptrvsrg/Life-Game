@@ -22,7 +22,10 @@ std::ostream & operator<<(std::ostream & os, Cell cell)
 
 std::istream & operator>>(std::istream & is, Cell & cell)
 {
+    // Remember previous exception state
     std::ios_base::iostate state = is.exceptions();
+
+    // Enable throwing exceptions on errors
     is.exceptions(std::ios_base::failbit);
 
     try
@@ -35,6 +38,7 @@ std::istream & operator>>(std::istream & is, Cell & cell)
         throw CellCoordinatesError();
     }
 
+    // Set back previous exception state
     is.exceptions(state);
 
     return is;

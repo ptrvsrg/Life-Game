@@ -7,11 +7,11 @@ struct LifeFileArgs
     std::string m_name;
     enum ExceptionType
     {
-        NO_EXCEPTION,
-        CELL_COORDINATES_ERROR,
         DIGIT_SET_ERROR,
+        FILE_FORMAT_ERROR,
+        FILE_OPENING_ERROR,
         FIELD_SIZE_ERROR,
-        FILE_FORMAT_ERROR
+        NO_EXCEPTION
     } m_exception_type;
 
     explicit LifeFileArgs(std::string name, ExceptionType exception_type)
@@ -27,15 +27,18 @@ INSTANTIATE_TEST_SUITE_P
     LifeFileTest,
     ::testing::Values
     (
+        LifeFileArgs("files/comments.life", LifeFileArgs::NO_EXCEPTION),
+        LifeFileArgs("files/duplicate_coordinates.life", LifeFileArgs::NO_EXCEPTION),
         LifeFileArgs("files/file_format.life", LifeFileArgs::FILE_FORMAT_ERROR),
-        LifeFileArgs("files/without_field_size_1.life", LifeFileArgs::FIELD_SIZE_ERROR),
-        LifeFileArgs("files/without_field_size_2.life", LifeFileArgs::FIELD_SIZE_ERROR),
-        LifeFileArgs("files/without_field_size_3.life", LifeFileArgs::FIELD_SIZE_ERROR),
+        LifeFileArgs("files/incorrect_field_size_1.life", LifeFileArgs::FIELD_SIZE_ERROR),
+        LifeFileArgs("files/incorrect_field_size_2.life", LifeFileArgs::FIELD_SIZE_ERROR),
+        LifeFileArgs("files/incorrect_field_size_3.life", LifeFileArgs::FIELD_SIZE_ERROR),
         LifeFileArgs("files/incorrect_rules_1.life", LifeFileArgs::DIGIT_SET_ERROR),
         LifeFileArgs("files/incorrect_rules_2.life", LifeFileArgs::DIGIT_SET_ERROR),
-        LifeFileArgs("files/negative_coordinates.life", LifeFileArgs::CELL_COORDINATES_ERROR),
-        LifeFileArgs("files/incorrect_coordinates.life", LifeFileArgs::CELL_COORDINATES_ERROR),
-        LifeFileArgs("files/comments.life", LifeFileArgs::NO_EXCEPTION)
+        LifeFileArgs("files/non_exist.life", LifeFileArgs::FILE_OPENING_ERROR),
+        LifeFileArgs("files/without_birth_rules.life", LifeFileArgs::NO_EXCEPTION),
+        LifeFileArgs("files/without_name.life", LifeFileArgs::NO_EXCEPTION),
+        LifeFileArgs("files/without_survival_rules.life", LifeFileArgs::NO_EXCEPTION)
     )
 );
 
@@ -45,16 +48,6 @@ TEST_P(LifeFileTest, check_exception)
 
     switch (params.m_exception_type)
     {
-        case LifeFileArgs::CELL_COORDINATES_ERROR:
-            EXPECT_THROW
-            (
-                {
-                    ILifeFile life_file(params.m_name);
-                    Universe universe = life_file.ReadUniverse();
-                },
-                CellCoordinatesError
-            );
-            break;
         case LifeFileArgs::DIGIT_SET_ERROR:
             EXPECT_THROW
             (
@@ -65,6 +58,24 @@ TEST_P(LifeFileTest, check_exception)
                 DigitSetError
             );
             break;
+        case LifeFileArgs::FILE_FORMAT_ERROR:
+            EXPECT_THROW
+            (
+                {
+                    ILifeFile life_file(params.m_name);
+                },
+                FileFormatError
+            );
+            break;
+        case LifeFileArgs::FILE_OPENING_ERROR:
+            EXPECT_THROW
+            (
+                {
+                    ILifeFile life_file(params.m_name);
+                },
+                FileOpeningError
+            );
+            break;
         case LifeFileArgs::FIELD_SIZE_ERROR:
             EXPECT_THROW
             (
@@ -73,15 +84,6 @@ TEST_P(LifeFileTest, check_exception)
                     Universe universe = life_file.ReadUniverse();
                 },
                 FieldSizeError
-            );
-            break;
-        case LifeFileArgs::FILE_FORMAT_ERROR:
-            EXPECT_THROW
-            (
-                {
-                    ILifeFile life_file(params.m_name);
-                },
-                FileFormatError
             );
             break;
         case LifeFileArgs::NO_EXCEPTION:

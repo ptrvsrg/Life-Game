@@ -1,4 +1,3 @@
 add_subdirectory(life_file_base)
 add_subdirectory(i_life_file)
 add_subdirectory(o_life_file)
-add_subdirectory(io_life_file)

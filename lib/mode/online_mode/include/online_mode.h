@@ -3,7 +3,8 @@
 
 #include <string>
 #include "abstract_mode.h"
-#include "io_life_file.h"
+#include "i_life_file.h"
+#include "o_life_file.h"
 
 class OnlineMode : public AbstractMode
 {

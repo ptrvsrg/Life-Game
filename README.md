@@ -1,6 +1,6 @@
 # Задача 2-1. Игра "Жизнь"
 
-[![Testing](https://github.com/ptrvsrg/NSU-OOP-CXX-Life-Game/actions/workflows/cmake.yml/badge.svg)](https://github.com/ptrvsrg/NSU-OOP-CXX-Life-Game/actions/workflows/cmake.yml)
+[![Testing](https://github.com/ptrvsrg/Life-Game/actions/workflows/cmake.yml/badge.svg)](https://github.com/ptrvsrg/Life-Game/actions/workflows/cmake.yml)
 
 ### Общие сведения
 
